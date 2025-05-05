@@ -138,6 +138,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           },
         ),
       )
+      ..loadHtmlString(_htmlPage, baseUrl: _baseUrl)
       ..loadRequest(Uri.parse(_baseUrl));
   }
 
