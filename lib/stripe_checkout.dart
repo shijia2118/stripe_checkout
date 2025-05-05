@@ -1,12 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:stripe_checkout/src/platforms/checkout.dart'
-    show CheckoutResponse;
 
 import 'src/platforms/checkout.dart';
-import 'src/platforms/stripe_checkout_mobile.dart'
+import 'src/platforms/stripe_checkout.dart'
     if (dart.library.js) 'src/platforms/stripe_checkout_web.dart' as stripe;
 
-Future<CheckoutResponse?> redirectToCheckout({
+Future<CheckoutResponse> redirectToCheckout({
   required BuildContext context,
   required String sessionId,
   required String publishableKey,
@@ -14,6 +12,7 @@ Future<CheckoutResponse?> redirectToCheckout({
   String? successUrl,
   String? canceledUrl,
 }) {
+  // ignore: deprecated_member_use_from_same_package
   return stripe.redirectToCheckout(
     context: context,
     sessionId: sessionId,

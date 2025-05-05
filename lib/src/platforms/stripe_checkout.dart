@@ -8,6 +8,51 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import 'checkout.dart';
 
+/// Redirects to a prebuilt payment web page hosted on Stripe
+///
+/// The view is rendered directly for web and inside a webview for
+/// mobile platforms
+///
+/// [successUrl] and [canceledUrl] are required on mobile platforms,
+/// they should be https and match the ones used to create the checkout
+/// session in your server
+///
+/// To have a custom route transition use [CheckoutPage] directly
+@Deprecated('Use CheckoutPage instead')
+Future<CheckoutResponse> redirectToCheckout({
+  required BuildContext context,
+  required String sessionId,
+  required String publishableKey,
+  String? stripeAccountId,
+  String? successUrl,
+  String? canceledUrl,
+}) async {
+  assert(() {
+    assert(
+      successUrl != null,
+      'successUrl can not be null when using checkout inside a webview',
+    );
+    assert(
+      canceledUrl != null,
+      'canceledUrl can not be null when using checkout inside a webview',
+    );
+    return true;
+  }());
+  final response = await Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => CheckoutPage(
+        sessionId: sessionId,
+        publishableKey: publishableKey,
+        stripeAccountId: stripeAccountId,
+        onCompleted: (response) => Navigator.of(context).pop(response),
+        successUrl: successUrl!,
+        canceledUrl: canceledUrl!,
+      ),
+    ),
+  );
+  return response ?? const CheckoutResponse.canceled();
+}
+
 /// Prebuilt payment web page hosted on Stripe loaded
 /// in app via a webview
 class CheckoutPage extends StatefulWidget {
