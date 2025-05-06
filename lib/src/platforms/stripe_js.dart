@@ -1,7 +1,7 @@
 @JS()
 library stripe;
 
-import 'dart:js_interop';
+import 'package:js/js.dart';
 
 @JS('Stripe')
 class Stripe {

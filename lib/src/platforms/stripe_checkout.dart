@@ -114,10 +114,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void initState() {
     super.initState();
+
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
+          onPageFinished: (String url) {
+            if (url == _baseUrl) {
+              _redirectToStripe(widget.sessionId);
+            }
+          },
           onNavigationRequest: (NavigationRequest request) {
             final successUrl = widget.successUrl;
             final canceledUrl = widget.canceledUrl;
@@ -131,15 +137,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
             }
             return NavigationDecision.navigate;
           },
-          onPageFinished: (String url) {
-            if (url == _baseUrl) {
-              _redirectToStripe(widget.sessionId);
-            }
-          },
         ),
       )
-      ..loadHtmlString(_htmlPage, baseUrl: _baseUrl)
-      ..loadRequest(Uri.parse(_baseUrl));
+      ..loadRequest(Uri.parse(_baseUrl))
+      ..loadHtmlString(_htmlPage, baseUrl: _baseUrl);
   }
 
   @override
@@ -149,9 +150,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         body: SafeArea(
-          child: WebViewWidget(
-            controller: _webViewController,
-          ),
+          child: WebViewWidget(controller: _webViewController),
         ),
       ),
     );
