@@ -120,7 +120,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
+            debugPrint('>>>>>>>$url');
+            if (url == _baseUrl) {
               _redirectToStripe(widget.sessionId);
+            }
           },
           onNavigationRequest: (NavigationRequest request) {
             final successUrl = widget.successUrl;
@@ -138,7 +141,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       )
       ..loadRequest(Uri.parse(_baseUrl))
-      ..loadHtmlString(_htmlPage, baseUrl: _baseUrl);
+      ..loadHtmlString(_htmlPage, baseUrl: initialUrl);
   }
 
   @override
