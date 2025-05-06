@@ -120,7 +120,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
-            debugPrint('>>>>>>>$url');
+            debugPrint('>>>>>2>>$url');
             if (url == _baseUrl) {
               _redirectToStripe(widget.sessionId);
             }
@@ -140,7 +140,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           },
         ),
       )
-      ..loadRequest(Uri.parse(_baseUrl))
+      ..loadRequest(Uri.parse(initialUrl))
       ..loadHtmlString(_htmlPage, baseUrl: initialUrl);
   }
 
