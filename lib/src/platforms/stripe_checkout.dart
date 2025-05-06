@@ -109,7 +109,7 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   late WebViewController _webViewController;
 
-  static const String _baseUrl = 'about:blank';
+  static const String _baseUrl = 'https://stripe.com/base_url/';
 
   @override
   void initState() {
@@ -120,9 +120,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
-            if (url == _baseUrl) {
               _redirectToStripe(widget.sessionId);
-            }
           },
           onNavigationRequest: (NavigationRequest request) {
             final successUrl = widget.successUrl;
@@ -139,6 +137,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           },
         ),
       )
+      ..loadRequest(Uri.parse(_baseUrl))
       ..loadHtmlString(_htmlPage, baseUrl: _baseUrl);
   }
 
