@@ -117,6 +117,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setUserAgent('Wizlah App')
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
