@@ -1,7 +1,5 @@
 library stripe_checkout;
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -53,8 +51,6 @@ Future<CheckoutResponse> redirectToCheckout({
   return response ?? const CheckoutResponse.canceled();
 }
 
-/// Prebuilt payment web page hosted on Stripe loaded
-/// in app via a webview
 class CheckoutPage extends StatefulWidget {
   CheckoutPage({
     Key? key,
@@ -107,25 +103,37 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  late WebViewController _webViewController;
+  late final WebViewController _webViewController;
 
   static const String _baseUrl = 'https://stripe.com/base_url/';
 
   @override
+  Widget build(BuildContext context) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          child: WebViewWidget(
+            controller: _webViewController,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
   void initState() {
     super.initState();
+    _initializeWebViewController();
+  }
 
+  void _initializeWebViewController() {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setUserAgent('Wizlah App')
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageFinished: (String url) {
-            if (url == _baseUrl) {
-              _redirectToStripe(widget.sessionId);
-            }
-          },
-          onNavigationRequest: (NavigationRequest request) {
+          onNavigationRequest: (request) {
             final successUrl = widget.successUrl;
             final canceledUrl = widget.canceledUrl;
 
@@ -138,27 +146,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
             }
             return NavigationDecision.navigate;
           },
+          onPageFinished: (String url) {
+            if (url == _baseUrl) {
+              _redirectToStripe(widget.sessionId);
+            }
+          },
         ),
       )
-      ..loadRequest(Uri.parse(_baseUrl));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: SafeArea(
-          child: WebViewWidget(controller: _webViewController),
-        ),
-      ),
-    );
-  }
-
-  String get initialUrl {
-    return 'data:text/html;base64,'
-        '${base64Encode(const Utf8Encoder().convert(_htmlPage))}';
+      ..loadHtmlString(_htmlPage, baseUrl: _baseUrl);
   }
 
   Future<void> _redirectToStripe(String sessionId) async {
@@ -174,6 +169,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       var stripe = Stripe("$publishableKey", {$options});
       stripe.redirectToCheckout({sessionId: "$sessionId"});
     ''';
+
     try {
       await _webViewController.runJavaScript(redirectToCheckoutJs);
     } on PlatformException catch (e) {
