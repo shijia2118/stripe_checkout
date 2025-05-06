@@ -109,7 +109,7 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   late WebViewController _webViewController;
 
-  static const String _baseUrl = 'https://stripe.com/base_url/';
+  static const String _baseUrl = 'about:blank';
 
   @override
   void initState() {
@@ -139,7 +139,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
           },
         ),
       )
-      ..loadRequest(Uri.parse(_baseUrl))
       ..loadHtmlString(_htmlPage, baseUrl: _baseUrl);
   }
 
